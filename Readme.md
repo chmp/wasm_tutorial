@@ -36,7 +36,7 @@ At the moment the following topics are covered:
 
 - calling functions with arguments that map to the WebAssembly types (`int32`,
   `int64`, `float32`, `float64`)
-- creation of objects living in WebAssembly and calling their methods
+- creating objects living in WebAssembly and calling their methods
 - passing strings and buffers to WebAssembly
 - receiving strings and buffers from WebAssembly
 
