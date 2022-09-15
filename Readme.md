@@ -10,6 +10,8 @@ Files:
 - [`index.html`](index.html): the set of exercises. Open the file in a recent
   WebBrowser, open the JavaScript console and follow the instructions. The idea
   is to implement the solutions in the file itself
+- [`src/lib.rs`](src/lib.rs): the Rust module that defines the objects being
+  wrapped 
 - [`solution/solution.html`](solution/solution.html): the same file with
   potential solutions for the different tasks. It aims to be as simple as
   possible and does not address error translation or optimizations. See the

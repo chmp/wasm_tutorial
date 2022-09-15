@@ -7,6 +7,28 @@
 <body>
 <h1>WebAssembly by Example</h1>
 <p>Open the JavaScript console to get started!</p>
+<p>The provided module corresponds to the following Python code:</p>
+<pre>
+def add(x: int, y: int) -> int:
+    return x + y
+
+class Adder:
+    def __init__(self, value: int):
+        self.value = value
+
+    def add(self, other: int) -> int:
+        return self.value + other
+
+class EvenStringLength:
+    def __init__(self, msg: str):
+        self.msg = msg
+
+    def is_message_len_even(self) -> bool:
+        return len(self.msg) % 2 == 0
+
+    def get_message(self) -> str:
+        return self.msg
+</pre>
 <script src="../module.js"></script>
 <script>
 async function main() {
@@ -287,7 +309,7 @@ console.log(
 
 }
 
-main().catch(console.error); 
+main().catch(console.error);
 </script>
 </body>
 </html>
