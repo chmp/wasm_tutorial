@@ -40,11 +40,22 @@ At the moment the following topics are covered:
 - passing strings and buffers to WebAssembly
 - receiving strings and buffers from WebAssembly
 
-The following concepts are still missing:
+The following points are still to be addressed:
 
 - passing references of JavaScript objects to WebAssembly
 - accessing properties of the JavaScript objects from WebAssembly
 - passing JavaScript callbacks to WebAssembly
+
+## Notes
+
+- WebAssembly supports functions with multiple arguments and a single return
+  value
+- Supported types are 32 bit integers and floats and 64 bit integers and floats
+- Other types need to be serialized and deserialized across WebAssembly <-> host
+  boundary
+- Memory is represented as a continuous array that is indexed by 32 bit unsigned
+  integers
+- Pointers are represented by such indices
 
 ## License
 
