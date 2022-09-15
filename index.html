@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf8">
+<title>WebAssembly by Example</title>
+</head>
+<body>
+<h1>WebAssembly by Example</h1>
+<p>Open the JavaScript console to get started!</p>
+<script src="module.js"></script>
+<script>
+async function main() {
+console.log(
+    "Task 1: compile the module and list its imports and exports" +
+    "\n\n" + 
+    "The module is available in the global variable `module_data` as an" +
+    "UInt8Array." + 
+    "\n\n" +
+    "Relevant API:" + 
+    "\n\n" + 
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module/imports\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module/exports\n" +
+    "\n\n" +
+    ""
+);
+
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log(
+    "Task 2: build a dummy import object and instantiate the module " + 
+    "\n\n" +
+    "The imported `__wbindgen_throw` method is called with two arguments a ptr " + 
+    "to a string and the length of the string in bytes, when an error occurs. " + 
+    "A simple implementation could just throw an error without using the " +
+    "function arguments." +
+    "\n\n" + 
+    "Relevant API:" +
+    "\n\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate\n" +
+    "\n\n" +
+    ""
+);
+
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log(
+    "Task 3: call the add function of the module" + 
+    "\n\n" +
+    "The add function has the signature `(x: int32, y: int32) -> int32`." +
+    "\n\n" +
+    "Relevant API:"  +
+    "\n\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance/exports\n" +
+    "\n\n"
+);
+
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log(
+    "Task 4: access the imported memory as an `UInt8Array` and an " + 
+    "`UInt32Array`, print the memory and array sizes and dump out the " + 
+    "first 16 bytes (or the first 4 Int32 values) "+ 
+    "\n\n" +
+    "The memory is exported under the name `\"memory\"`." +
+    "\n\n" +
+    "Warning: WebAssembly memory can be resized from within the " +
+    "WebAssembly module. This operation will reset the array views (in " +
+    "this case the  byteLength / length of the array views will be zero)." +
+    "\n\n" + 
+    "Relevant API:" + 
+    "\n\n" + 
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array\n" +
+    "\n\n"
+)
+
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log(
+    "Task 5: construct an adder object, call it's add function and free it" +
+    "\n\n" +
+    "Equivalent Python class:" +
+    "\n\n" +
+    "    class Adder:\n" +
+    "        def __init__(self, value: int):\n" +
+    "            self.value = value\n" +
+    "\n" +
+    "        def add(self, other: int):\n" +
+    "            return self.value + other\n" +
+    "\n\n" +
+    "Exported functions:" + 
+    "\n\n" +
+    "- `adder_new(value: int32) -> uint32` returns the ptr of the object\n" + 
+    "- `adder_add(ptr: uint32, other: int32) -> int32`\n" +
+    "- `__wbg_adder_free(ptr: uint32)`\n" +
+    "\n\n"
+);
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log("Task 6: dump the memory of the adder object\n\n");
+
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log(
+    "Task 7: construct EvenStringLengthCopy object and check whether the " +
+    "passed string has an even length" +
+    "\n\n" +
+    "Equivalent Python class:" +
+    "\n\n" +
+    "    class EvenStringLengthCopy:\n" +
+    "        def __init__(self, msg: str):\n" +
+    "            self.msg = msg\n" +
+    "\n" +
+    "        def is_message_len_even(self):\n" +
+    "            return len(self.msg) % 2 == 0\n"+
+    "\n" +
+    "        def get_message(self):\n" +
+    "            return self.message\n" +
+    "\n" +
+    "        def get_first_part(self):\n" + 
+    "            return self.message.split()[0]\n" +
+    "\n" +
+    "Example string byte values:\n" +
+    "\n" + 
+    "    [104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]\n" +
+    "\n" + 
+    "Exported functions:\n" +
+    "\n" +
+    "- `__wbindgen_malloc(size: uint32)`\n" + 
+    "- `evenstringlength_new(stringPtr: uint32, stringLength: uint32) -> uint32`\n" + 
+    "- `evenstringlength_is_message_len_even`(objectPtr: uint32) -> uint32\n" +
+    "- `__wbg_evenstringlength_free(objectPtr: uint32)`\n" +
+    "\n\n"
+);
+
+
+throw new Error('Not implemented: Write your solution here')
+
+console.log(
+    "Task 8: call the get_message method of the `EvenStringLength` object\n" +
+    "\n" +
+    "Note the returned string needs to be free'd\n" +
+    "\n" +
+    "Exported functions:\n" +
+    "\n" +
+    "- `evenstringlengthcopy_get_message(returnPtr: uint32, objectPtr: uint32)`: " +
+    "writes the string ptr and the string lengths as uint32 to the returnPtr " +
+    "address\n" +
+    "- `__wbindgen_free(ptr: uint32, size: uint32)`\n" +
+    "\n\n"
+);
+
+throw new Error('Not implemented: Write your solution here')
+
+
+}
+
+main().catch(console.error); 
+</script>
+</body>
+</html>

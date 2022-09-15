@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf8">
+<title>WebAssembly by Example</title>
+</head>
+<body>
+<h1>WebAssembly by Example</h1>
+<p>Open the JavaScript console to get started!</p>
+<script src="../module.js"></script>
+<script>
+async function main() {
+console.log(
+    "Task 1: compile the module and list its imports and exports" +
+    "\n\n" + 
+    "The module is available in the global variable `module_data` as an" +
+    "UInt8Array." + 
+    "\n\n" +
+    "Relevant API:" + 
+    "\n\n" + 
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module/imports\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module/exports\n" +
+    "\n\n" +
+    ""
+);
+
+
+const module = await WebAssembly.compile(module_data);
+
+console.log("Imports");
+WebAssembly.Module.imports(module).forEach(imp => console.log(imp));
+
+console.log("Exports");
+WebAssembly.Module.exports(module).forEach(imp => console.log(imp));
+
+
+console.log(
+    "Task 2: build a dummy import object and instantiate the module " + 
+    "\n\n" +
+    "The imported `__wbindgen_throw` method is called with two arguments a ptr " + 
+    "to a string and the length of the string in bytes, when an error occurs. " + 
+    "A simple implementation could just throw an error without using the " +
+    "function arguments." +
+    "\n\n" + 
+    "Relevant API:" +
+    "\n\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate\n" +
+    "\n\n" +
+    ""
+);
+
+
+const imports = {
+    wbg: {
+        __wbindgen_throw: (messagePtr, messageLen) => { throw new Error("Not implemented"); },
+    },
+};
+
+const instance = await WebAssembly.instantiate(module, imports);
+console.log("instance", instance);
+
+
+console.log(
+    "Task 3: call the add function of the module" + 
+    "\n\n" +
+    "The add function has the signature `(x: int32, y: int32) -> int32`." +
+    "\n\n" +
+    "Relevant API:"  +
+    "\n\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance/exports\n" +
+    "\n\n"
+);
+
+
+console.log("2 + 3:", instance.exports.add(2, 3));
+
+
+console.log(
+    "Task 4: access the imported memory as an `UInt8Array` and an " + 
+    "`UInt32Array`, print the memory and array sizes and dump out the " + 
+    "first 16 bytes (or the first 4 Int32 values) "+ 
+    "\n\n" +
+    "The memory is exported under the name `\"memory\"`." +
+    "\n\n" +
+    "Warning: WebAssembly memory can be resized from within the " +
+    "WebAssembly module. This operation will reset the array views (in " +
+    "this case the  byteLength / length of the array views will be zero)." +
+    "\n\n" + 
+    "Relevant API:" + 
+    "\n\n" + 
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\n" +
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array\n" +
+    "\n\n"
+)
+
+
+{
+    const uint8View = new Uint8Array(instance.exports.memory.buffer);
+    const uint32View = new Uint32Array(instance.exports.memory.buffer);
+
+    console.log("memory size      ", instance.exports.memory.buffer.byteLength);
+    console.log("memory size [u8] ", uint8View.length);
+    console.log("memory size [u32]", uint32View.length);
+
+    console.log("Bytes:");
+    for(let i = 0; i < 16; i++) {
+        console.log(uint8View[i]);
+    }
+
+    console.log("Ints:");
+    for(let i = 0; i < 4; i++) {
+        console.log(uint32View[i]);
+    }
+}
+
+
+console.log(
+    "Task 5: construct an adder object, call it's add function and free it" +
+    "\n\n" +
+    "Equivalent Python class:" +
+    "\n\n" +
+    "    class Adder:\n" +
+    "        def __init__(self, value: int):\n" +
+    "            self.value = value\n" +
+    "\n" +
+    "        def add(self, other: int):\n" +
+    "            return self.value + other\n" +
+    "\n\n" +
+    "Exported functions:" + 
+    "\n\n" +
+    "- `adder_new(value: int32) -> uint32` returns the ptr of the object\n" + 
+    "- `adder_add(ptr: uint32, other: int32) -> int32`\n" +
+    "- `__wbg_adder_free(ptr: uint32)`\n" +
+    "\n\n"
+);
+
+{
+    const ptr = instance.exports.adder_new(2);
+    console.log("2 + 3 =>", instance.exports.adder_add(ptr, 3));
+    instance.exports.__wbg_adder_free(ptr);
+}
+
+
+console.log("Task 6: dump the memory of the adder object\n\n");
+
+
+{
+    const uint32View = new Int32Array(instance.exports.memory.buffer);
+    const ptr = instance.exports.adder_new(42);
+
+    for(let i = 0; i < 5; i++) {
+        console.log(ptr / 4 + i, uint32View[ptr / 4 + i]);
+    }
+    instance.exports.__wbg_adder_free(ptr);
+}
+
+
+console.log(
+    "Task 7: construct EvenStringLengthCopy object and check whether the " +
+    "passed string has an even length" +
+    "\n\n" +
+    "Equivalent Python class:" +
+    "\n\n" +
+    "    class EvenStringLengthCopy:\n" +
+    "        def __init__(self, msg: str):\n" +
+    "            self.msg = msg\n" +
+    "\n" +
+    "        def is_message_len_even(self):\n" +
+    "            return len(self.msg) % 2 == 0\n"+
+    "\n" +
+    "        def get_message(self):\n" +
+    "            return self.message\n" +
+    "\n" +
+    "        def get_first_part(self):\n" + 
+    "            return self.message.split()[0]\n" +
+    "\n" +
+    "Example string byte values:\n" +
+    "\n" + 
+    "    [104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]\n" +
+    "\n" + 
+    "Exported functions:\n" +
+    "\n" +
+    "- `__wbindgen_malloc(size: uint32)`\n" + 
+    "- `evenstringlength_new(stringPtr: uint32, stringLength: uint32) -> uint32`\n" + 
+    "- `evenstringlength_is_message_len_even`(objectPtr: uint32) -> uint32\n" +
+    "- `__wbg_evenstringlength_free(objectPtr: uint32)`\n" +
+    "\n\n"
+);
+
+
+{
+    const stringLength = 11;
+    const stringPtr = instance.exports.__wbindgen_malloc(stringLength);
+    {
+        const uint8View = new Uint8Array(instance.exports.memory.buffer);
+        uint8View[stringPtr + 0] = 104;
+        uint8View[stringPtr + 1] = 101;
+        uint8View[stringPtr + 2] = 108;
+        uint8View[stringPtr + 3] = 108;
+        uint8View[stringPtr + 4] = 111;
+        uint8View[stringPtr + 5] = 32;
+        uint8View[stringPtr + 6] = 119;
+        uint8View[stringPtr + 7] = 111;
+        uint8View[stringPtr + 8] = 114;
+        uint8View[stringPtr + 9] = 108;
+        uint8View[stringPtr + 10] = 100;
+    }
+    const objectPtr = instance.exports.evenstringlength_new(stringPtr, stringLength);
+    console.log("is even?", instance.exports.evenstringlength_new(objectPtr) == 0);
+
+    {
+        const uint32View = new Uint32Array(instance.exports.memory.buffer);
+        for(let i = 0; i < 5; i++) {
+            console.log(`[${i}]: ${uint32View[objectPtr / 4 + i]}`);
+        }
+        console.log(".");
+
+        const stringPtr = uint32View[objectPtr / 4 + 1];
+        const stringLength = uint32View[objectPtr / 4 + 2];
+        const uint8View = new Uint8Array(instance.exports.memory.buffer);
+        
+        for(let i = 0; i < stringLength; i++) {
+            console.log(`[${i}] ${uint8View[stringPtr + i]}`)
+        }
+    }
+
+
+    instance.exports.__wbg_evenstringlength_free(objectPtr);
+}
+
+
+console.log(
+    "Task 8: call the get_message method of the `EvenStringLength` object\n" +
+    "\n" +
+    "Note the returned string needs to be free'd\n" +
+    "\n" +
+    "Exported functions:\n" +
+    "\n" +
+    "- `evenstringlengthcopy_get_message(returnPtr: uint32, objectPtr: uint32)`: " +
+    "writes the string ptr and the string lengths as uint32 to the returnPtr " +
+    "address\n" +
+    "- `__wbindgen_free(ptr: uint32, size: uint32)`\n" +
+    "\n\n"
+);
+
+{
+    let objectPtr;
+    {
+        const stringLength = 11;
+        const stringPtr = instance.exports.__wbindgen_malloc(stringLength);
+    
+        const uint8View = new Uint8Array(instance.exports.memory.buffer);
+        uint8View[stringPtr + 0] = 104;
+        uint8View[stringPtr + 1] = 101;
+        uint8View[stringPtr + 2] = 108;
+        uint8View[stringPtr + 3] = 108;
+        uint8View[stringPtr + 4] = 111;
+        uint8View[stringPtr + 5] = 32;
+        uint8View[stringPtr + 6] = 119;
+        uint8View[stringPtr + 7] = 111;
+        uint8View[stringPtr + 8] = 114;
+        uint8View[stringPtr + 9] = 108;
+        uint8View[stringPtr + 10] = 100;
+        objectPtr = instance.exports.evenstringlength_new(stringPtr, stringLength);
+    }
+    
+    const returnPtr = instance.exports.__wbindgen_malloc(8);
+    instance.exports.evenstringlength_get_message(returnPtr, objectPtr);
+    
+    let stringPtr, stringLength;
+    {
+        const uint32View = new Uint32Array(instance.exports.memory.buffer);
+        stringPtr = uint32View[returnPtr / 4 + 0];
+        stringLength = uint32View[returnPtr / 4 + 1];
+    }
+    instance.exports.__wbindgen_free(returnPtr, 8);
+
+    {
+        const uint8View = new Uint8Array(instance.exports.memory.buffer);
+        console.log(uint8View.subarray(stringPtr, stringPtr + stringLength));
+    }
+    instance.exports.__wbindgen_free(stringPtr, stringLength);
+}
+
+
+}
+
+main().catch(console.error); 
+</script>
+</body>
+</html>
